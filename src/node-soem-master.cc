@@ -62,7 +62,9 @@ class NodeSoemMaster : public Nan::ObjectWrap {
 
                 } else {
 
-                    String::Utf8Value str(info[0]->ToString());
+                    //~ String::Utf8Value str(info[0]->ToString());
+                    //~ String::Utf8Value str(info[0]->ToString(Nan::GetCurrentContext()).FromMaybe(v8::Local<v8::String>());
+                    v8::Local<v8::String> str = info[0]->ToString(Nan::GetCurrentContext()).FromMaybe(v8::Local<v8::String>());
 
                     strcpy(ifname, (char*) *str);
 
@@ -80,7 +82,7 @@ class NodeSoemMaster : public Nan::ObjectWrap {
                 const int argc = 1;
                 Local<Value> argv[argc] = { info[0] };
                 Local<Function> cons = Nan::New(constructor());
-                info.GetReturnValue().Set(cons->NewInstance(argc, argv));
+                info.GetReturnValue().Set(Nan::NewInstance(cons,argc, argv).ToLocalChecked());
 
             }
 
@@ -161,14 +163,16 @@ class NodeSoemMaster : public Nan::ObjectWrap {
                 return;
             }
 
-            slave = info[0]->Uint32Value();
+            //~ slave = info[0]->Uint32Value(Nan::GetCurrentContext());
+            slave = info[0]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 
             if (info[1]->IsUndefined()) {
                 isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "No state defined in writeState.")));
                 return;
             }
 
-            reqstate = info[1]->Uint32Value();
+            //~ reqstate = info[1]->Uint32Value(Nan::GetCurrentContext());
+            reqstate = info[1]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 
             ec_slave[slave].state = reqstate;
 
@@ -201,13 +205,13 @@ class NodeSoemMaster : public Nan::ObjectWrap {
                 return;
             }
 
-            slave = info[0]->Uint32Value();
+            slave = info[0]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 
             if (info[1]->IsUndefined()) {
                 isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "No requested state in statecheck.")));
             }
 
-            reqstate = info[1]->Uint32Value();
+            reqstate = info[1]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 
             int retVal = ec_statecheck(slave, reqstate, timeout);
 
