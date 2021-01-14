@@ -159,7 +159,7 @@ class NodeSoemMaster : public Nan::ObjectWrap {
 
 
             if (info[0]->IsUndefined()) {
-                isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "No slave defined in writeState.")));
+                isolate->ThrowException(Exception::TypeError(Nan::MaybeLocal<String>(String::NewFromUtf8(isolate, "No slave defined in writeState.")).ToLocalChecked()));
                 return;
             }
 
@@ -167,7 +167,7 @@ class NodeSoemMaster : public Nan::ObjectWrap {
             slave = info[0]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 
             if (info[1]->IsUndefined()) {
-                isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "No state defined in writeState.")));
+                isolate->ThrowException(Exception::TypeError(Nan::MaybeLocal<String>(String::NewFromUtf8(isolate, "No state defined in writeState.")).ToLocalChecked()));
                 return;
             }
 
@@ -201,14 +201,14 @@ class NodeSoemMaster : public Nan::ObjectWrap {
             int timeout = 1000;
 
             if (info[0]->IsUndefined()) {
-                isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "No slave defined in statecheck.")));
+                isolate->ThrowException(Exception::TypeError(Nan::MaybeLocal<String>(String::NewFromUtf8(isolate, "No slave defined in statecheck.")).ToLocalChecked()));
                 return;
             }
 
             slave = info[0]->Uint32Value(Nan::GetCurrentContext()).FromJust();
 
             if (info[1]->IsUndefined()) {
-                isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "No requested state in statecheck.")));
+                isolate->ThrowException(Exception::TypeError(Nan::MaybeLocal<String>(String::NewFromUtf8(isolate, "No requested state in statecheck.")).ToLocalChecked()));
             }
 
             reqstate = info[1]->Uint32Value(Nan::GetCurrentContext()).FromJust();
@@ -232,6 +232,7 @@ class NodeSoemMaster : public Nan::ObjectWrap {
                 Local<Object> slave = Object::New(isolate);
 
                 slave->Set(String::NewFromUtf8(isolate, "name"), String::NewFromUtf8(isolate, ec_slave[i].name));
+                //~ Nan::Set(slave, String::NewFromUtf8(isolate, "name"), String::NewFromUtf8(isolate, ec_slave[i].name));
                 slave->Set(String::NewFromUtf8(isolate, "state"), Number::New(isolate, ec_slave[i].state));
                 slave->Set(String::NewFromUtf8(isolate, "ALStatusocde"), Number::New(isolate, ec_slave[i].ALstatuscode));
                 slave->Set(String::NewFromUtf8(isolate, "configadr"), Number::New(isolate, ec_slave[i].configadr));
