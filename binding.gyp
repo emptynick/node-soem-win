@@ -8,13 +8,19 @@
             "include_dirs" : [ 
                 "lib/soem", 
                 "lib/osal", 
-                "lib/osal/linux", 
-                "lib/oshw/linux", 
+                "lib/osal/win32",
+                "lib/oshw/win32",
+                "lib/oshw/win32/wpcap/Include",
                 "<!(node -e \"require('nan')\")" 
             ],
-            "libraries" : [ 
-                "../lib/build/libsoem.a" 
-            ]
+            "libraries" : [
+                "../lib/build/soem.lib",
+                "../lib/oshw/win32/wpcap/Lib/x64/wpcap.lib",
+                "../lib/oshw/win32/wpcap/Lib/x64/Packet.lib",
+                "winmm.lib",
+                "Ws2_32.lib",
+                "msvcrt.lib"
+            ],
         }
     ]
 }

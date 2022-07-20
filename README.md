@@ -2,6 +2,8 @@
 
 ## Installation
 
+Run the following in a x64 Visual Studio developer console
+
 `npm install node-soem`
 
 Make sure to have `git` and `cmake` installed on you system. The installation process builds a shared library from the [Simple Open EtherCAT Master](https://github.com/openethercatsociety/soem).

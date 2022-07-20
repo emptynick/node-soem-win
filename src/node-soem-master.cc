@@ -33,14 +33,14 @@ class NodeSoemMaster : public Nan::ObjectWrap {
 
             SetPrototypeMethod(tpl, "getSlaves", getSlaves);
             SetPrototypeMethod(tpl, "getInterfaceName", getInterfaceName);
+            SetPrototypeMethod(tpl, "getAdapters", getAdapters);
             SetPrototypeMethod(tpl, "getMap", getMap);
 
             SetPrototypeMethod(tpl, "getExpectedWC", getExpectedWC);
 
             constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
 
-            Nan::Set(target, Nan::New("NodeSoemMaster").ToLocalChecked(),
-                    Nan::GetFunction(tpl).ToLocalChecked());
+            Nan::Set(target, Nan::New("NodeSoemMaster").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 
         }
 
@@ -56,18 +56,15 @@ class NodeSoemMaster : public Nan::ObjectWrap {
 
                 char *ifname = (char*) calloc(1, 20);
 
+                Isolate* isolate = info.GetIsolate();
+
                 if (info[0]->IsUndefined() || !info[0]->IsString()) {
 
                     ifname = (char *) "eth0";
 
                 } else {
-
-                    //~ String::Utf8Value str(info[0]->ToString());
-                    //~ String::Utf8Value str(info[0]->ToString(Nan::GetCurrentContext()).FromMaybe(v8::Local<v8::String>());
-                    v8::Local<v8::String> str = info[0]->ToString(Nan::GetCurrentContext()).FromMaybe(v8::Local<v8::String>());
-
-                    strcpy(ifname, (char*) *str);
-
+                    v8::Local<v8::String> fileName = info[0].As<v8::String>();
+                    (*info[0].As<v8::String>())->WriteUtf8(isolate, ifname);
                 }
 
                 NodeSoemMaster* obj = new NodeSoemMaster(ifname);
@@ -222,6 +219,7 @@ class NodeSoemMaster : public Nan::ObjectWrap {
         static NAN_METHOD(getSlaves) {
 
             Isolate* isolate = info.GetIsolate();
+            Local<Context> context = isolate->GetCurrentContext();
 
             Local<Array> arr = Array::New(isolate);
 
@@ -231,34 +229,31 @@ class NodeSoemMaster : public Nan::ObjectWrap {
 
                 Local<Object> slave = Object::New(isolate);
 
-                slave->Set(String::NewFromUtf8(isolate, "name"), String::NewFromUtf8(isolate, ec_slave[i].name));
-                //~ Nan::Set(slave, String::NewFromUtf8(isolate, "name"), String::NewFromUtf8(isolate, ec_slave[i].name));
-                slave->Set(String::NewFromUtf8(isolate, "state"), Number::New(isolate, ec_slave[i].state));
-                slave->Set(String::NewFromUtf8(isolate, "ALStatusocde"), Number::New(isolate, ec_slave[i].ALstatuscode));
-                slave->Set(String::NewFromUtf8(isolate, "configadr"), Number::New(isolate, ec_slave[i].configadr));
-                slave->Set(String::NewFromUtf8(isolate, "aliasadr"), Number::New(isolate, ec_slave[i].aliasadr));
+                slave->Set(context, String::NewFromUtf8(isolate, "name").ToLocalChecked(), String::NewFromUtf8(isolate, ec_slave[i].name).ToLocalChecked());
+                slave->Set(context, String::NewFromUtf8(isolate, "state").ToLocalChecked(), Number::New(isolate, ec_slave[i].state));
+                slave->Set(context, String::NewFromUtf8(isolate, "ALStatusocde").ToLocalChecked(), Number::New(isolate, ec_slave[i].ALstatuscode));
+                slave->Set(context, String::NewFromUtf8(isolate, "configadr").ToLocalChecked(), Number::New(isolate, ec_slave[i].configadr));
+                slave->Set(context, String::NewFromUtf8(isolate, "aliasadr").ToLocalChecked(), Number::New(isolate, ec_slave[i].aliasadr));
 
                 int numbytes = ec_slave[i].Obytes;
                 if ((numbytes == 0) && (ec_slave[i].Obits > 0)) numbytes = 1;
                 if (numbytes > 8) numbytes = 8;
 
-                slave->Set(String::NewFromUtf8(isolate, "Obits"), Uint32::New(isolate, ec_slave[i].Obits));
-                slave->Set(String::NewFromUtf8(isolate, "Obytes"), Uint32::New(isolate, ec_slave[i].Obytes));
-                slave->Set(String::NewFromUtf8(isolate, "outputs"),
-                        ArrayBuffer::New(isolate, (void*) ec_slave[i].outputs, numbytes));
+                slave->Set(context, String::NewFromUtf8(isolate, "Obits").ToLocalChecked(), Uint32::New(isolate, ec_slave[i].Obits));
+                slave->Set(context, String::NewFromUtf8(isolate, "Obytes").ToLocalChecked(), Uint32::New(isolate, ec_slave[i].Obytes));
+                slave->Set(context, String::NewFromUtf8(isolate, "outputs").ToLocalChecked(), ArrayBuffer::New(isolate, numbytes));
 
                 numbytes = ec_slave[i].Ibytes;
                 if ((numbytes == 0) && (ec_slave[i].Ibits > 0)) numbytes = 1;
                 if (numbytes > 8) numbytes = 8;
 
-                slave->Set(String::NewFromUtf8(isolate, "Ibits"), Uint32::New(isolate, ec_slave[i].Ibits));
-                slave->Set(String::NewFromUtf8(isolate, "Ibytes"), Uint32::New(isolate, ec_slave[i].Ibytes));
-                slave->Set(String::NewFromUtf8(isolate, "inputs"),
-                        ArrayBuffer::New(isolate, (void*) ec_slave[i].inputs, numbytes));
+                slave->Set(context, String::NewFromUtf8(isolate, "Ibits").ToLocalChecked(), Uint32::New(isolate, ec_slave[i].Ibits));
+                slave->Set(context, String::NewFromUtf8(isolate, "Ibytes").ToLocalChecked(), Uint32::New(isolate, ec_slave[i].Ibytes));
+                slave->Set(context, String::NewFromUtf8(isolate, "inputs").ToLocalChecked(), ArrayBuffer::New(isolate, numbytes));
 
-                slave->Set(String::NewFromUtf8(isolate, "pdelay"), Uint32::New(isolate, ec_slave[i].pdelay));
+                slave->Set(context, String::NewFromUtf8(isolate, "pdelay").ToLocalChecked(), Uint32::New(isolate, ec_slave[i].pdelay));
 
-                arr->Set(i-1, slave);
+                arr->Set(context, i-1, slave);
 
                 i++;
 
@@ -274,8 +269,26 @@ class NodeSoemMaster : public Nan::ObjectWrap {
 
             NodeSoemMaster* obj = ObjectWrap::Unwrap<NodeSoemMaster>(info.Holder());
 
-            info.GetReturnValue().Set(String::NewFromUtf8(isolate, obj->ifname_));
+            info.GetReturnValue().Set(String::NewFromUtf8(isolate, obj->ifname_).ToLocalChecked());
 
+        }
+
+        static NAN_METHOD(getAdapters) {
+            ec_adaptert * adapter = NULL;
+            Isolate* isolate = info.GetIsolate();
+            int counter = 0;
+            Local<Array> data = Array::New(isolate);
+
+            adapter = ec_find_adapters ();
+
+            while (adapter != NULL)
+            {
+                printf ("Description : %s, Device to use for wpcap: %s\n", adapter->desc,adapter->name);
+                data->Set(isolate->GetCurrentContext(), counter, String::NewFromUtf8(isolate, adapter->name).ToLocalChecked());
+                adapter = adapter->next;
+                counter++;
+            }
+            info.GetReturnValue().Set(data);
         }
 
 
@@ -285,7 +298,7 @@ class NodeSoemMaster : public Nan::ObjectWrap {
 
             NodeSoemMaster* obj = ObjectWrap::Unwrap<NodeSoemMaster>(info.Holder());
 
-            Local<ArrayBuffer> buffer = ArrayBuffer::New(isolate, (void*)&obj->ioMap_, 4096);
+            Local<ArrayBuffer> buffer = ArrayBuffer::New(isolate, 4096);
 
             info.GetReturnValue().Set(buffer);
 
@@ -308,7 +321,6 @@ class NodeSoemMaster : public Nan::ObjectWrap {
 
         char *ifname_;
         char ioMap_[4096];
-
 };
 
 NODE_MODULE(objectwrapper, NodeSoemMaster::Init)

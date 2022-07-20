@@ -4,12 +4,12 @@
   "description": "Simple Open EtherCAT Master for Node.JS.",
   "main": "build/Release/node-soem",
   "dependencies": {
-    "nan": "^2.14.2",
-    "node-gyp": "^3.3.0"
+    "nan": "^2.16.0",
+    "node-gyp": "^9.1.0"
   },
   "devDependencies": {},
   "scripts": {
-    "preinstall": ". scripts/preinstall.sh",
+    "preinstall": "scripts/preinstall.bat",
     "install": "node-gyp rebuild",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
